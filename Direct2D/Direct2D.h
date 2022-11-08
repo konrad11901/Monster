@@ -4,16 +4,7 @@
 
 #include <windows.h>
 #include <d2d1_3.h>
-#include <profileapi.h>
-
-class Timer {
-public:
-	Timer();
-
-	double get_time(int seconds);
-private:
-	LARGE_INTEGER frequency;
-};
+#include "Timer.h"
 
 class Direct2D {
 public:
@@ -31,6 +22,7 @@ private:
 	ID2D1RadialGradientBrush* left_eye_brush;
 	ID2D1RadialGradientBrush* right_eye_brush;
 	ID2D1PathGeometry* monster_path;
+	ID2D1PathGeometry* nose_path;
 	Timer timer;
 
 	FLOAT angle = 0.0f;
@@ -69,6 +61,8 @@ private:
 		{ .r = 0.8f, .g = 0.76f, .b = 0.89f, .a = 1.0f };
 	static constexpr D2D1_COLOR_F brush_color =
 		{ .r = 0.0f, .g = 0.0f, .b = 0.0f, .a = 1.0f };
+	static constexpr D2D1_COLOR_F nose_color = 
+		{ .r = 0.4f, .g = 0.4f, .b = 0.4f, .a = 1.0f };
 };
 
 INT WINAPI wWinMain(_In_ HINSTANCE instance,

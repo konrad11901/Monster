@@ -4,29 +4,14 @@
 #include <cmath>
 #include <numbers>
 
-Timer::Timer() {
-    QueryPerformanceFrequency(&frequency);
-}
-
-double Timer::get_time(int seconds) {
-    LARGE_INTEGER curr_counter;
-    QueryPerformanceCounter(&curr_counter);
-
-    auto difference = curr_counter.QuadPart % (frequency.QuadPart * seconds);
-
-    return (double)difference / (double)frequency.QuadPart;
-}
-
 Direct2D::Direct2D() : hwnd(nullptr), d2d_factory(nullptr), d2d_render_target(nullptr), main_brush(nullptr),
-main_rad_brush(nullptr), left_eye_brush(nullptr), right_eye_brush(nullptr), monster_path(nullptr) {}
+main_rad_brush(nullptr), left_eye_brush(nullptr), right_eye_brush(nullptr), monster_path(nullptr), nose_path(nullptr) {}
 
 Direct2D::~Direct2D() {
     if (d2d_factory) {
         d2d_factory->Release();
     }
-    if (d2d_render_target) {
-        d2d_render_target->Release();
-    }
+    DiscardDeviceResources();
 }
 
 HRESULT Direct2D::Initialize(HINSTANCE instance, INT cmd_show) {
@@ -162,6 +147,7 @@ HRESULT Direct2D::CreateDeviceResources() {
 
         if (SUCCEEDED(hr)) {
             monster_path = create_monster();
+            nose_path = create_nose();
         }
     }
 
@@ -175,6 +161,7 @@ void Direct2D::DiscardDeviceResources() {
     if (right_eye_brush) right_eye_brush->Release();
     if (main_rad_brush) main_rad_brush->Release();
     if (monster_path) monster_path->Release();
+    if (nose_path) nose_path->Release();
 }
 
 INT WINAPI wWinMain(_In_ [[maybe_unused]] HINSTANCE instance,
@@ -244,7 +231,21 @@ ID2D1PathGeometry* Direct2D::create_monster() {
 }
 
 ID2D1PathGeometry* Direct2D::create_nose() {
-    return nullptr;
+    using D2D1::Point2F;
+    using D2D1::BezierSegment;
+
+    ID2D1PathGeometry* path = nullptr;
+    ID2D1GeometrySink* path_sink = nullptr;
+    d2d_factory->CreatePathGeometry(&path);
+    path->Open(&path_sink);
+    path_sink->BeginFigure(Point2F(0.0f, 38.3f), D2D1_FIGURE_BEGIN_FILLED);
+    path_sink->AddBezier(BezierSegment(Point2F(1.8f, 40.9f), Point2F(16.2f, 25.1f), Point2F(14.6f, 23.0f)));
+    path_sink->AddBezier(BezierSegment(Point2F(15.3f, 18.9f), Point2F(-16.4f, 19.2f), Point2F(-16.3f, 22.3f)));
+    path_sink->AddBezier(BezierSegment(Point2F(-16.7f, 26.2f), Point2F(-0.7f, 40.9f), Point2F(0.0f, 38.33f)));
+    path_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+    path_sink->Close();
+
+    return path;
 }
 
 ID2D1PathGeometry* Direct2D::create_smile() {
@@ -353,6 +354,10 @@ HRESULT Direct2D::OnRender() {
         d2d_render_target->FillEllipse(right_ball, main_brush);
 
         d2d_render_target->SetTransform(mouth_transformation);
+        main_brush->SetColor(nose_color);
+        d2d_render_target->FillGeometry(nose_path, main_brush);
+        main_brush->SetColor(brush_color);
+        d2d_render_target->DrawGeometry(nose_path, main_brush);
         d2d_render_target->DrawGeometry(mouth_path, main_brush, 3.0f);
 
         hr = d2d_render_target->EndDraw();
