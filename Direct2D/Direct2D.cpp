@@ -39,9 +39,7 @@ HRESULT Direct2D::Initialize(HINSTANCE instance, INT cmd_show) {
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = sizeof(LONG_PTR);
     wcex.hInstance = instance;
-    wcex.hbrBackground = NULL;
-    wcex.lpszMenuName = NULL;
-    wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
+    wcex.hCursor = LoadCursor(nullptr, IDI_APPLICATION);
     wcex.lpszClassName = L"D2DDemoApp";
 
     ATOM register_result = RegisterClassEx(&wcex);
@@ -183,15 +181,10 @@ INT WINAPI wWinMain(_In_ [[maybe_unused]] HINSTANCE instance,
     _In_opt_ [[maybe_unused]] HINSTANCE prev_instance,
     _In_ [[maybe_unused]] PWSTR cmd_line,
     _In_ [[maybe_unused]] INT cmd_show) {
-    if (SUCCEEDED(CoInitialize(nullptr))) {
-        {
-            Direct2D app;
+    Direct2D app;
 
-            if (SUCCEEDED(app.Initialize(instance, cmd_show))) {
-                app.RunMessageLoop();
-            }
-        }
-        CoUninitialize();
+    if (SUCCEEDED(app.Initialize(instance, cmd_show))) {
+        app.RunMessageLoop();
     }
 
     return 0;
