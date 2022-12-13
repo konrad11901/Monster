@@ -68,6 +68,11 @@ void Monster::CreateDeviceIndependentResources() {
 
     // Initialize the Direct2D Factory.
     winrt::check_hresult(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, options, d2d_factory.put()));
+
+    monster_path = CreateMonster();
+    nose_path = CreateNose();
+    smile_path = CreateSmile();
+    sad_path = CreateSad();
 }
 
 void Monster::CreateDeviceDependentResources() {
@@ -147,9 +152,6 @@ void Monster::CreateDeviceDependentResources() {
     winrt::check_hresult(d2d_context->CreateRadialGradientBrush(
         RadialGradientBrushProperties(Point2F(43.0f, -12.0f), Point2F(0, 0), 34, 34),
         eye_stops.get(), right_eye_brush.put()));
-
-    monster_path = CreateMonster();
-    nose_path = CreateNose();
 }
 
 void Monster::CreateWindowSizeDependentResources() {
@@ -242,7 +244,6 @@ void Monster::OnRender() {
     using D2D1::Ellipse;
 
     auto mouth_transformation = Matrix3x2F::Rotation(angle) * transformation;
-    auto mouth_path = mouse_down ? CreateSmile() : CreateSad();
     auto left_ball = CreateBall(true), right_ball = CreateBall(false);
 
     d2d_context->BeginDraw();
@@ -252,10 +253,8 @@ void Monster::OnRender() {
     d2d_context->FillGeometry(monster_path.get(), main_rad_brush.get());
     d2d_context->DrawGeometry(monster_path.get(), main_brush.get());
 
-    auto left_eye = Point2F(-EYE_X_OFFSET, EYE_Y_OFFSET);
-    d2d_context->FillEllipse(Ellipse(left_eye, EYE_RADIUS, EYE_RADIUS), left_eye_brush.get());
-    auto right_eye = Point2F(EYE_X_OFFSET, EYE_Y_OFFSET);
-    d2d_context->FillEllipse(Ellipse(right_eye, EYE_RADIUS, EYE_RADIUS), right_eye_brush.get());
+    d2d_context->FillEllipse(left_eye, left_eye_brush.get());
+    d2d_context->FillEllipse(right_eye, right_eye_brush.get());
 
     d2d_context->FillEllipse(left_ball, main_brush.get());
     d2d_context->FillEllipse(right_ball, main_brush.get());
@@ -265,7 +264,7 @@ void Monster::OnRender() {
     d2d_context->FillGeometry(nose_path.get(), main_brush.get());
     main_brush->SetColor(brush_color);
     d2d_context->DrawGeometry(nose_path.get(), main_brush.get());
-    d2d_context->DrawGeometry(mouth_path.get(), main_brush.get(), 3.0f);
+    d2d_context->DrawGeometry(mouse_down ? smile_path.get() : sad_path.get(), main_brush.get(), 3.0f);
 
     winrt::check_hresult(d2d_context->EndDraw());
 

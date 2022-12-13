@@ -34,6 +34,7 @@ private:
     winrt::com_ptr<ID2D1RadialGradientBrush> right_eye_brush;
     winrt::com_ptr<ID2D1PathGeometry> monster_path;
     winrt::com_ptr<ID2D1PathGeometry> nose_path;
+    winrt::com_ptr<ID2D1PathGeometry> smile_path, sad_path;
     Timer timer;
 
     D2D1::Matrix3x2F transformation;
@@ -47,6 +48,9 @@ private:
     static constexpr FLOAT EYE_Y_OFFSET = -12.0f;
     static constexpr FLOAT EYE_RADIUS = 34.0f;
     static constexpr FLOAT EYE_BALL_RADIUS = 8.0f;
+
+    static constexpr D2D1_ELLIPSE left_eye = { { -EYE_X_OFFSET, EYE_Y_OFFSET }, EYE_RADIUS, EYE_RADIUS };
+    static constexpr D2D1_ELLIPSE right_eye = { { EYE_X_OFFSET, EYE_Y_OFFSET }, EYE_RADIUS, EYE_RADIUS };
 
     static constexpr D2D1_COLOR_F clear_color =
     { .r = 1.0f, .g = 1.0f, .b = 1.0f, .a = 1.0f };
