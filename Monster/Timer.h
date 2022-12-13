@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include "framework.h"
 #include <profileapi.h>
 
 class Timer {
